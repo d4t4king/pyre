@@ -50,7 +50,17 @@ def main():
             listening.append(proto + ":" + port)
         else:
             print("Didn't match line..." + l)
-    pp.pprint(listening)
+    #pp.pprint(listening)
+
+	# get the existing rules (?)
+	table = iptc.Table(iptc.Table.FILTER)
+	for chain in table.chains:
+		print "====================="
+		print "Chain ", chain.name
+		for rule in chain.rules:
+			print "Rule", "proto:", rule.protocol, "src:", rule.src, "dst:", \
+				rule.dst, "in:", rule.in_interface, "out:", rule.out_interface, 
+	print "====================="
 
 if __name__ == '__main__':
     main()
