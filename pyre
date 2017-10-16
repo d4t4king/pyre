@@ -1,11 +1,40 @@
 #!/usr/bin/python
 
+import os
 import re
-import iptc
 import pprint
+import fnmatch
 import subprocess
 
 pp = pprint.PrettyPrinter(indent=4)
+
+def find(pattern, path):
+	result = []
+	for root, dirs, files in os.walk(path):
+		for name in files:
+			if fnmatch.fnmatch(name, pattern):
+				result.append(os.path.join(root, name))
+	return result
+
+try:
+	import iptc
+except Exception, e:
+	if "can't find directory with extensions" in str(e):
+		print("The python iptables module couldn't find the library it needs.")
+		print("Searching could take several minutes....")
+		exts = find('libxtables.so.*', '/')
+		if len(exts) > 1:
+			path = ''
+			for x in exts:
+				path = os.path.dirname(x)
+			print '''
+The python-iptables module couldn't find the iptables extensions 
+library (libxtables.so.x.y.z).  But I was able to find it at the 
+following path.  Export the variable with the following command,
+then rerun this script.
+'''
+			print("export XTABLES_LIBDIR=\"" + path + "\"")
+		
 listening = []
 
 def main():
