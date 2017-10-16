@@ -5,21 +5,21 @@ import pprint
 import subprocess
 
 pp = pprint.PrettyPrinter(indent=4)
-listening = {}
+listening = []
 
 def main():
     netstat = subprocess.Popen(('netstat', '-antp'), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     out = subprocess.check_output(('grep', 'LISTEN'), stdin=netstat.stdout)
     #pp.pprint(out)
     for l in out.splitlines():
-        match = re.search(r'(\w+)\s+\d+\s+\d+\s+[0-9.]+:(\d+)', str(out))
+        match = re.search(r'(\w+)\s+\d+\s+\d+\s+[0-9:.]+:(\d+)', str(l))
         if match:
             print("proto: {0} port: {1}".format(match.group(1), match.group(2)))
             proto = match.group(1)
             port = match.group(2)
-            listening[proto] = port
+            listening.append(proto + ":" + port)
         else:
-            print("Didn't match any lines...")
+            print("Didn't match line..." + l)
     pp.pprint(listening)
 
 if __name__ == '__main__':
