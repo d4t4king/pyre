@@ -2,6 +2,7 @@
 
 import os
 import re
+import sys
 import pprint
 import fnmatch
 import subprocess
@@ -21,6 +22,7 @@ try:
 except Exception, e:
 	if "can't find directory with extensions" in str(e):
 		print("The python iptables module couldn't find the library it needs.")
+        """
 		print("Searching could take several minutes....")
 		exts = find('libxtables.so.*', '/')
 		if len(exts) > 1:
@@ -34,6 +36,7 @@ following path.  Export the variable with the following command,
 then rerun this script.
 '''
 			print("export XTABLES_LIBDIR=\"" + path + "\"")
+        """
 		
 listening = []
 
@@ -41,6 +44,7 @@ def main():
     netstat = subprocess.Popen(('netstat', '-antp'), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     out = subprocess.check_output(('grep', 'LISTEN'), stdin=netstat.stdout)
     #pp.pprint(out)
+    print("Getting listening ports.....")
     for l in out.splitlines():
         match = re.search(r'(\w+)\s+\d+\s+\d+\s+[0-9:.]+:(\d+)', str(l))
         if match:
@@ -52,15 +56,18 @@ def main():
             print("Didn't match line..." + l)
     #pp.pprint(listening)
 
-	# get the existing rules (?)
-	table = iptc.Table(iptc.Table.FILTER)
-	for chain in table.chains:
-		print "====================="
-		print "Chain ", chain.name
-		for rule in chain.rules:
-			print "Rule", "proto:", rule.protocol, "src:", rule.src, "dst:", \
-				rule.dst, "in:", rule.in_interface, "out:", rule.out_interface, 
-	print "====================="
+    if 'iptc' not in sys.modules:
+        print("python-iptables module not loaded.  Wrapping iptables binary.")
+    else:
+    	# get the existing rules (?)
+    	table = iptc.Table(iptc.Table.FILTER)
+    	for chain in table.chains:
+    		print "====================="
+    		print "Chain ", chain.name
+    		for rule in chain.rules:
+    			print "Rule", "proto:", rule.protocol, "src:", rule.src, "dst:", \
+    				rule.dst, "in:", rule.in_interface, "out:", rule.out_interface, 
+    	print "====================="
 
 if __name__ == '__main__':
     main()
