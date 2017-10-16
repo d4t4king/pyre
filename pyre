@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import re
+import iptc
 import pprint
 import subprocess
 
@@ -14,7 +15,7 @@ def main():
     for l in out.splitlines():
         match = re.search(r'(\w+)\s+\d+\s+\d+\s+[0-9:.]+:(\d+)', str(l))
         if match:
-            print("proto: {0} port: {1}".format(match.group(1), match.group(2)))
+            #print("proto: {0} port: {1}".format(match.group(1), match.group(2)))
             proto = match.group(1)
             port = match.group(2)
             listening.append(proto + ":" + port)
